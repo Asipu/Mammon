@@ -1,0 +1,164 @@
+set PATH=%PATH%;node_modules\.bin
+
+// app.use(express.static(__dirname + '/dist'));
+
+var e1 = my.find(i => i.get('id') === 10)
+var e2 = my.find(i => i.get('id') === 11)
+console.log(e1.get('id') + ', ' + e1.get('date'))
+console.log(e2.get('id') + ', ' + e2.get('date'))
+
+var x1 = e1
+var x2 = e2
+console.log(x1 == e1 ? 'e1 x1 same' : 'e1 x1 DIFF')
+console.log(x2 == e2 ? 'e2 x2 same' : 'e2 x2 DIFF')
+
+my = my.map(i => {
+  if(i.get('id') !== 10) return i
+  return i.update('date', date => 'xxx')
+
+})
+
+e1 = my.find(i => i.get('id') === 10)
+e2 = my.find(i => i.get('id') === 11)
+console.log(e1.get('id') + ', ' + e1.get('date'))
+console.log(e2.get('id') + ', ' + e2.get('date'))
+
+console.log(x1 == e1 ? 'e1 x1 same' : 'e1 x1 DIFF')
+console.log(x2 == e2 ? 'e2 x2 same' : 'e2 x2 DIFF')
+
+// console.log(my.find((i, index) => i.get('id') === 10).get('date'))
+
+// entries.toArray().forEach(i => console.log(`${i.get('id')}, ${i.get('date')}`))
+
+
+/*********************************
+- Component hierarchy -
+
+
+EntriesBox : container, state/dispatch
+
+  EntriesOverview : fnc{entries, onAddClick, ?onDelete, ?onSwitchEntry, onSwitchMode}
+
+    Entry : fnc{data, previous, onDelete, onSwitchEntry}
+
+
+EntryBox : container, state/dispatch
+
+  EntryOverview : fnc{entry, ?onUpdateItem, ?onDelItem}
+
+    Group : fnc{type, ?items, ?onUpdateItem, ?onDelItem}
+
+      GroupList : fnc{items, ?onUpdateItem, ?onDelItem}
+
+        GroupItem : React{id, name, amount, editing, onUpdateItem, onDelete}
+
+          GroupItemEdit : React{name, amount, onSave, onDelete}
+
+          GroupItemView : React{name, amount}
+
+----------------------------------------------------------------------------
+
+EntriesBox : container, state/dispatch
+
+  EntriesOverview : fnc{entries, onAddEntry, onSwitchMode}
+
+    Entry : dispatch, fnc{data, previous, onDelEntry, onSwitchEntry}
+
+
+EntryBox : container, state
+
+  EntryOverview : fnc{entry}
+
+    Group : fnc{type, items}
+
+        GroupItem : dispatch, React{id, name, amount, editing}
+
+          GroupItemEdit : React{id, name, amount, onUpdateItem, onDelItem}
+
+          GroupItemView : fnc{name, amount, onEdit}
+*********************************/
+
+const isDeveloping = process.env.NODE_ENV !== 'production';
+
+
+/*
+console.log(`Woah: ${JSON.stringify(store.getState())}`);
+store.dispatch({
+	id: 1,
+	type: 'DEL_ENTRY'
+});
+console.log(`Woah: ${JSON.stringify(store.getState())}`);
+*/
+
+
+<div onClick={() => this.props.store.dispatch({
+id: 1,
+type: 'DEL_ENTRY'
+})}>CLICK ME PLEASE</div>
+</div>
+
+// ***************************************
+
+import React from 'react';
+import { connect } from 'react-redux'
+
+const TestComponent = ({data}) => {
+  return (
+    <div>
+      <br/>
+      {data.date}
+    </div>
+  );
+}
+
+let TestContainer = ({entries, onChange}) => {
+  var result = [];
+
+  console.log(entries);
+
+  for (var i in entries) {
+    result.push(
+      <TestComponent key={i} data={entries[i]} />);
+  }
+
+  console.log(result);
+
+  return (
+    <div>Entries
+      {result}
+      <br/>
+      <div onClick={onChange}>CHANGE</div>
+    </div>
+  );
+}
+
+const mapStateToProps = (state) => {
+  return {entries: state.entries};
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onChange: () =>
+      dispatch({
+        type: 'UPDATE_ITEM',
+        name: 'ZZZ',
+        amount: 100
+      })
+  }
+}
+
+TestContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TestContainer)
+
+export default TestContainer;
+
+// ***************************************
+
+If you plan on performing multiple chained iterations over immutable data like:
+
+myMap.filter(somePred).sort(someComp)
+… then it is very important to first convert it into Seq using toSeq and after iterations turn it back to desired form like:
+
+myMap.toSeq().filter(somePred).sort(someComp).toOrderedMap()
